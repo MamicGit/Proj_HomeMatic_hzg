@@ -1,0 +1,368 @@
+
+!Neue Garageroutinen
+!aktuelles Programm: "GrgLounge_Heizung_AUTO_AN_Fr"
+!Testvariable Heizungsroutinen Grg
+
+Testprogramm:		"GrgLounge_Heizung_AUTOMATICS"
+
+'GrgLounge_HzgTEST_AN'			Anschalt-Variable													AUS;AN
+'GrgLounge_HzgTEST_BasisT'		Testvar für 'GrgHeizung_00_BasisT'									Minimalwert: -45 / Maximalwert: 60
+'GrgLounge_HzgTEST_IsActive'	Testvar für "GrgHeizung_01Fr_Aktiv"									inaktiv;aktiv
+'GrgLounge_HzgTEST_TempIndor'	Testvar für "HmIP-RF.000A9A49993D23:1.ACTUAL_TEMPERATURE"
+'00_TestVariable_ZK'			Testvar für 'WochTg = system.Date("%a")'
+!trigger_CelsiusI = Innentemeratur trigger
+!an immer 	08:07	08:27	08:47   
+					
+
+!!!BEI ROLLOUT!!!
+'GrgLounge_HzgTEST_IsActive'	austausch mit GrgHeizung_01Fr_Aktiv, GrgHeizung_01Sa_Aktiv und GrgHeizung_01So_Aktiv
+'GrgLounge_HzgTEST_AN'			überlegen ob wir gleich die Schalter zu anschalten setzen wie in den Original-Programmen, oder eine Vorschaltvariable.
+
+
+'''
+Unit-Test SDV
+!dom.GetObject("GrgLounge_HzgTEST_BasisT").State(12);
+!dom.GetObject("GrgLounge_HzgTEST_TempIndor").State(9);
+!dom.GetObject("00_TestVariable_ZK").State("Sat");
+!dom.GetObject("00_ValueHour").State("08:27"); 
+'''
+
+Start Programme
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+!1. Script! Freitag
+string val_hour = system.Date("%H:%M").ToString();
+integer HZG_AN = dom.GetObject("GrgLounge_HzgTEST_AN").Value();
+real CelsiusA = dom.GetObject("GrgHeizung_00_BasisT").Value();
+real CelsiusI = dom.GetObject("GrgHeizung_00_BasisT_In").Value();
+integer isActive = dom.GetObject("GrgLounge_HzgTEST_IsActive").Value();
+string WochTg = system.Date("%a");
+integer lc = 0; string i;integer lct = 0; string list_res = ""; integer HZG = 0;
+string trigger_CelsiusI = "0;2;4;6;8;10;12;14;16;40";	!Lesemodus: ist die Innentemp < i dann sofort WAHR
+
+if ((WochTg == "Fri") && (CelsiusA < 6) && (CelsiusI < 6)) {quit; }else{
+if ((WochTg != "Fri") || (isActive == 0) || (HZG_AN == 1)) {quit; }else{ 
+if (CelsiusA >=15) {
+	string AnschaltZeit = "ZuKalt;08:07;09:07;09:47;10:27;11:27;12:07;13:07;13:47;14:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{ 
+if (CelsiusA >=14){
+	string AnschaltZeit = "ZuKalt;07:27;08:27;09:07;10:07;11:07;11:47;12:47;13:27;14:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{			
+if (CelsiusA >=12) {
+	string AnschaltZeit = "ZuKalt;06:47;07:47;08:47;09:27;10:27;11:27;12:27;13:27;14:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{	
+if (CelsiusA >=10) {
+	string AnschaltZeit = "ZuKalt;06:27;07:27;08:27;09:27;10:27;11:07;12:07;13:07;14:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=8) {
+	string AnschaltZeit = "ZuKalt;06:07;07:07;08:07;09:07;10:07;11:07;12:07;13:07;14:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=6) {
+	string AnschaltZeit = "ZuKalt;05:27;06:27;07:27;08:47;09:47;10:47;11:47;12:47;14:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=4) {
+	string AnschaltZeit = "ZuKalt;04:47;05:47;07:07;08:07;09:27;10:27;11:27;12:47;13:47";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=2) {
+	string AnschaltZeit = "ZuKalt;04:07;05:27;06:27;07:47;08:47;10:07;11:27;12:27;13:47";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{	
+if (CelsiusA >=0) {
+	string AnschaltZeit = "ZuKalt;03:27;04:47;06:07;07:07;08:27;09:47;11:07;12:27;13:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{quit;}}}}}}}}}}}	
+
+dom.GetObject("GrgLounge_HzgTEST_AN").State(HZG);
+dom.GetObject("GrgLounge_HzgTEST_AN").State(0,10000,true);
+
+
+!1. Script! Samstag
+string val_hour = system.Date("%H:%M").ToString();
+integer HZG_AN = dom.GetObject("GrgLounge_HzgTEST_AN").Value();
+real CelsiusA = dom.GetObject("GrgHeizung_00_BasisT").Value();
+real CelsiusI = dom.GetObject("GrgHeizung_00_BasisT_In").Value();
+integer isActive = dom.GetObject("GrgLounge_HzgTEST_IsActive").Value();
+string WochTg = system.Date("%a");
+integer lc = 0; string i;integer lct = 0; string list_res = ""; integer HZG = 0;
+string trigger_CelsiusI = "0;2;4;6;8;10;12;14;16;40";
+
+if ((WochTg == "Sat") && (CelsiusA < 0) && (CelsiusI < 5)) {quit; }else{
+if ((WochTg != "Sat") || (isActive == 0) || (HZG_AN == 1)) {quit; }else{ 
+if (CelsiusA >=15) {
+	string AnschaltZeit = "ZuKalt;06:07;07:07;07:47;08:27;09:27;10:07;11:07;11:47;12:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{ 
+if (CelsiusA >=14){
+	string AnschaltZeit = "ZuKalt;05:27;06:27;07:07;08:07;09:07;09:47;10:47;11:27;12:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{			
+if (CelsiusA >=12) {
+	string AnschaltZeit = "ZuKalt;04:47;05:47;06:47;07:27;08:27;09:27;10:27;11:27;12:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{	
+if (CelsiusA >=10) {
+	string AnschaltZeit = "ZuKalt;04:27;05:27;06:27;07:27;08:27;09:07;10:07;11:07;12:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=8) {
+	string AnschaltZeit = "ZuKalt;04:07;05:07;06:07;07:07;08:07;09:07;10:07;11:07;12:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=6) {
+	string AnschaltZeit = "ZuKalt;03:27;04:27;05:27;06:47;07:47;08:47;09:47;10:47;12:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=4) {
+	string AnschaltZeit = "ZuKalt;02:47;03:47;05:07;06:07;07:27;08:27;09:27;10:47;11:47";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=2) {
+	string AnschaltZeit = "ZuKalt;02:27;03:27;04:27;05:47;06:47;08:07;09:27;10:27;11:47";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{	
+if (CelsiusA >=0) {
+	string AnschaltZeit = "ZuKalt;02:27;02:47;04:07;05:07;06:27;07:47;09:07;10:27;11:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{quit;}}}}}}}}}}}	
+
+dom.GetObject("GrgLounge_HzgTEST_AN").State(HZG);
+dom.GetObject("GrgLounge_HzgTEST_AN").State(0,10000,true);
+
+
+!1. Script! Sonntag
+string val_hour = system.Date("%H:%M").ToString();
+integer HZG_AN = dom.GetObject("GrgLounge_HzgTEST_AN").Value();
+real CelsiusA = dom.GetObject("GrgHeizung_00_BasisT").Value();
+real CelsiusI = dom.GetObject("GrgHeizung_00_BasisT_In").Value();
+integer isActive = dom.GetObject("GrgLounge_HzgTEST_IsActive").Value();
+string WochTg = system.Date("%a");
+integer lc = 0; string i;integer lct = 0; string list_res = ""; integer HZG = 0;
+string trigger_CelsiusI = "0;2;4;6;8;10;12;14;16;40";
+
+if ((WochTg == "Sun") && (CelsiusA < -3) && (CelsiusI < 3)) {quit; }else{
+if ((WochTg != "Sun") || (isActive == 0) || (HZG_AN == 1)) {quit; }else{ 
+if (CelsiusA >=15) {
+	string AnschaltZeit = "ZuKalt;03:47;04:47;05:27;06:07;07:07;07:47;08:47;09:27;10:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{ 
+if (CelsiusA >=14){
+	string AnschaltZeit = "ZuKalt;03:07;04:07;04:47;05:47;06:47;07:27;08:27;09:07;10:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{			
+if (CelsiusA >=12) {
+	string AnschaltZeit = "ZuKalt;02:27;03:27;04:27;05:07;06:07;07:07;08:07;09:07;09:47";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{	
+if (CelsiusA >=10) {
+	string AnschaltZeit = "ZuKalt;02:27;03:07;04:07;05:07;06:07;06:47;07:47;08:47;09:47";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=8) {
+	string AnschaltZeit = "ZuKalt;02:27;02:47;03:47;04:47;05:47;06:47;07:47;08:47;09:47";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=6) {
+	string AnschaltZeit = "ZuKalt;02:27;02:27;03:07;04:27;05:27;06:27;07:27;08:27;09:47";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=4) {
+	string AnschaltZeit = "ZuKalt;02:27;02:27;02:47;03:47;05:07;06:07;07:07;08:27;09:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if (CelsiusA >=2) {
+	string AnschaltZeit = "ZuKalt;02:27;02:27;02:27;03:27;04:27;05:47;07:07;08:07;09:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{	
+if (CelsiusA >=0) {
+	string AnschaltZeit = "ZuKalt;02:27;02:27;02:27;02:47;04:07;05:27;06:47;08:07;09:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (AnschaltZeit.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{quit;}}}}}}}}}}}	
+
+dom.GetObject("GrgLounge_HzgTEST_AN").State(HZG);
+dom.GetObject("GrgLounge_HzgTEST_AN").State(0,10000,true);
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+!Datensicherung Funktionabel und fertig vom Montag den 19.Jan 2026
+!1. Script! Freitag
+var val_hour = system.Date("%H:%M").ToString();
+real HZG_AN = dom.GetObject("GrgLounge_HzgTEST_AN").Value();
+real CelsiusA = dom.GetObject("GrgLounge_HzgTEST_BasisT").Value();
+real CelsiusI = dom.GetObject("GrgLounge_HzgTEST_TempIndor").Value();
+real isActive = dom.GetObject("GrgLounge_HzgTEST_IsActive").Value();
+integer lc = 0; string i;integer lct = 0; string list_res = ""; integer HZG = 0;   
+
+if ((isActive == 0) || (HZG_AN == 1) || (system.Date("%a") != "Fri")) {quit; }else{ 
+if (CelsiusA < -3) {quit; }else{
+if ((CelsiusA >=15) && (CelsiusA < 19)) {
+	string trigger_CelsiusI = "5;7;9;11;13;15;17;19;30"; string appanzeige = "09:27;09:47;10:47;12:07;13:07;14:07;15:27;16:07;16:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{ 
+if ((CelsiusA >=12) && (CelsiusA < 15)) {
+	string trigger_CelsiusI = "11;13;15;17;19;30"; string appanzeige = "kaelter;11:47;13:27;15:07;16:07;16:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{			
+if ((CelsiusA >=6) && (CelsiusA < 12)) {
+	string trigger_CelsiusI = "11;13;15;17;19;30"; string appanzeige = "kaelter;11:27;13:07;14:27;16:07;16:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{	
+if ((CelsiusA >=-3) && (CelsiusA < 6)) {
+	string trigger_CelsiusI = "13;15;17;19;30"; string appanzeige = "kaelter;12:47;14:27;16:07;16:27";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{quit;}}}}}}	
+
+dom.GetObject("GrgLounge_HzgTEST_AN").State(HZG);
+
+
+!2. Script! Samstag
+var val_hour = system.Date("%H:%M").ToString();
+real HZG_AN = dom.GetObject("GrgLounge_HzgTEST_AN").Value();
+real CelsiusA = dom.GetObject("GrgLounge_HzgTEST_BasisT").Value();
+real CelsiusI = dom.GetObject("GrgLounge_HzgTEST_TempIndor").Value();
+real isActive = dom.GetObject("GrgLounge_HzgTEST_IsActive").Value();
+integer lc = 0; string i;integer lct = 0; string list_res = ""; integer HZG = 0;   
+
+if ((isActive == 0) || (HZG_AN == 1) || (system.Date("%a") != "Sat")) {quit; }else{ 
+if (CelsiusA < -3) {quit; }else{
+if ((CelsiusA >=15) && (CelsiusA < 19)) {
+	string trigger_CelsiusI = "5;7;9;11;13;15;17;19;30"; string appanzeige = "04:07;04:27;05:27;06:27;07:27;08:47;09:47;10:47;11:07";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{ 
+if ((CelsiusA >=12) && (CelsiusA < 15)) {
+	string trigger_CelsiusI = "9;11;13;15;17;19;30"; string appanzeige = "kaelter;08:59;10:20;11:40;12:59;14:20;14:21";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{			
+if ((CelsiusA >=6) && (CelsiusA < 12)) {
+	string trigger_CelsiusI = "11;13;15;17;19;30"; string appanzeige = "kaelter;09:58;11:25;12:51;14:16;14:17";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{	
+if ((CelsiusA >=-3) && (CelsiusA < 6)) {
+	string trigger_CelsiusI = "11;13;15;17;19;30"; string appanzeige = "kaelter;09:36;11:09;12:41;14:12;14:13";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{quit;}}}}}}
+
+dom.GetObject("GrgLounge_HzgTEST_AN").State(HZG);
+
+
+!3. Script! Sonntag
+var val_hour = system.Date("%H:%M").ToString();
+real HZG_AN = dom.GetObject("GrgLounge_HzgTEST_AN").Value();
+real CelsiusA = dom.GetObject("GrgLounge_HzgTEST_BasisT").Value();
+real CelsiusI = dom.GetObject("GrgLounge_HzgTEST_TempIndor").Value();
+real isActive = dom.GetObject("GrgLounge_HzgTEST_IsActive").Value();
+integer lc = 0; string i;integer lct = 0; string list_res = ""; integer HZG = 0;   
+
+if ((isActive == 0) || (HZG_AN == 1) || (system.Date("%a") != "Sun")) {quit; }else{ 
+if (CelsiusA < -3) {quit; }else{
+if ((CelsiusA >=15) && (CelsiusA < 19)) {
+	string trigger_CelsiusI = "5;7;9;11;13;15;17;19;30"; string appanzeige = "07:30;07:46;08:53;09:59;11:06;12:13;13:20;14:26;14:30";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{ 
+if ((CelsiusA >=12) && (CelsiusA < 15)) {
+	string trigger_CelsiusI = "9;11;13;15;17;19;30"; string appanzeige = "kaelter;08:59;10:20;11:40;12:59;14:20;14:21";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{			
+if ((CelsiusA >=6) && (CelsiusA < 12)) {
+	string trigger_CelsiusI = "11;13;15;17;19;30"; string appanzeige = "kaelter;09:58;11:25;12:51;14:16;14:17";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if ((CelsiusA >=-3) && (CelsiusA < 6)) {
+	string trigger_CelsiusI = "11;13;15;17;19;30"; string appanzeige = "kaelter;09:36;11:09;12:41;14:12;14:13";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{
+if ((CelsiusA >=-20) && (CelsiusA < -3)) {
+	string trigger_CelsiusI = "10;11;13;15;17;30"; string appanzeige = "kaelter;09:10;10:50;12:30;14:09;14:10";
+	foreach (i,trigger_CelsiusI.Split(";")) {if(CelsiusI <= i){lc = lc + 1;}else{lc = 0;} lct = lct + 1;}
+	list_res = (appanzeige.StrValueByIndex(";",lct - lc).ToString());}
+    if (list_res == val_hour) {HZG = 1;}else{quit;}}}}}}}
+
+dom.GetObject("GrgLounge_HzgTEST_AN").State(HZG);
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+!SDV Standards
+
+real CelsiusA = dom.GetObject("GrgLounge_HzgTEST_BasisT").Value();
+real CelsiusI = dom.GetObject("GrgLounge_HzgTEST_TempIndor").Value();
+real isActive = dom.GetObject("GrgLounge_HzgTEST_IsActive").Value();
+
+!	dom.GetObject("GrgLounge_HzgTEST_AN").State(0);
+!	dom.GetObject("GrgLounge_HzgTEST_BasisT").State(16);
+!	dom.GetObject("GrgLounge_HzgTEST_TempIndor").State(12);
+!	dom.GetObject("GrgLounge_HzgTEST_IsActive").State(0);
+
+WriteLine(CelsiusA #"\n"# CelsiusI #"\n"# isActive)    
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+!Routine zum tracken des Programmmechanismus falls nötig, aktuell Tracking in CCU in 'Systemprotokoll'(Auslösen, Aktion)
+
+var on_var = dom.GetObject("GrgLounge_Hzg_AN").Value();
+string OnTRacker = dom.GetObject("GrgLounge_Hzg_AN_Verhalten").Value();
+var TimeStmp = system.Date("%F %T").ToString();
+var TimeStmp2 = system.Date("%T").ToString();
+string ph_new = " |X| ";
+
+
+if ((TimeStmp2 > '02:30:00') && (TimeStmp2 < '18:00:00')){
+
+string OnLog = OnTRacker # ph_new # TimeStmp # ": " # on_var.ToString(0);
+dom.GetObject("GrgLounge_Hzg_AN_Verhalten").State(OnLog); }else{
+dom.GetObject("GrgLounge_Hzg_AN").State(0);
+dom.GetObject("GrgLounge_Hzg_AN_Verhalten").State("start");}   
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
